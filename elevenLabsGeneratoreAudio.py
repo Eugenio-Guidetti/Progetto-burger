@@ -1,18 +1,11 @@
-import requests
 import os
 import apiKeysManager
+import requests
+import util
 
 
 def getApiKey():
     return apiKeysManager.getApiKey(os.environ["ELEVEN_LABS_API_KEY"])
-
-
-def getVoiceId():
-    return os.environ["VOICE_ID"]
-
-
-def getVoiceOutputFilePath():
-    return f"{os.getcwd()}\\{os.environ["VOICE_OUTPUT_FILE_PATH"]}"
 
 
 def getVociDisponibili():
@@ -30,15 +23,15 @@ def getVociDisponibili():
     if not str(response.status_code).startswith("2"):
         errore = response.json()
         print(f"Si è verificato un errore: {errore}")
-        raise errore
+        raise Exception(errore)
 
     data = response.json()
 
     return data
 
 
-def convertTextToAudio(testo: str):
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{getVoiceId()}"
+def convertiTestoVoce(testo: str):
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{util.getVoceSelezionata()}"
 
     headers = {
         "Accept": "audio/mpeg",
@@ -57,14 +50,17 @@ def convertTextToAudio(testo: str):
     if not str(response.status_code).startswith("2"):
         errore = response.json()
         print(f"Si è verificato un errore: {errore}")
-        raise errore
+        raise Exception(errore)
+    
+    if not os.path.exists(f"{util.getOutputFolder()}"):
+        os.makedirs(util.getOutputFolder())
 
     CHUNK_SIZE = 1024
-    path = getVoiceOutputFilePath()
+    voceOutputFilePath = util.getVoceOutputFilePath()
 
-    with open(path, "wb") as file:
+    with open(voceOutputFilePath, "wb") as file:
         for chunk in response.iter_content(chunk_size=CHUNK_SIZE):
             if chunk:
                 file.write(chunk)
 
-    return path
+    return voceOutputFilePath
