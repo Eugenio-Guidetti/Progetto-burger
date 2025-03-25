@@ -1,4 +1,4 @@
 *.key
-out
-in
-__pycache__
+out/
+in/
+__pycache__/
