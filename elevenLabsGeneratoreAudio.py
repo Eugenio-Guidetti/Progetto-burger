@@ -46,7 +46,7 @@ def convertiTestoVoce(testo: str):
     data = {
         "text": testo,
         "model_id": "eleven_multilingual_v2",
-        "voice_settings": {"speed": 1.09, "stability": 0.6, "similarity_boost": 0.8},
+        "voice_settings": {"speed": 1, "stability": 0.6, "similarity_boost": 0.85},
     }
 
     response = requests.post(url, headers=headers, json=data)
