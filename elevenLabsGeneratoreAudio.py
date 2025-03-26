@@ -10,7 +10,7 @@ def getApiKey():
 
 def getVociDisponibili():
 
-    url = "https://api.elevenlabs.io/v1/voices"
+    url = "https://api.elevenlabs.io/v2/voices?include_total_count=true"
 
     headers = {
         "Accept": "application/json",
@@ -31,7 +31,11 @@ def getVociDisponibili():
 
 
 def convertiTestoVoce(testo: str):
-    url = f"https://api.elevenlabs.io/v1/text-to-speech/{util.getVoceSelezionata()}"
+    
+    if util.getIdVoceSelezionata() == "":
+        raise Exception("Nessuna voce selezionata")
+
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{util.getIdVoceSelezionata()}"
 
     headers = {
         "Accept": "audio/mpeg",
@@ -49,9 +53,8 @@ def convertiTestoVoce(testo: str):
 
     if not str(response.status_code).startswith("2"):
         errore = response.json()
-        print(f"Si è verificato un errore: {errore}")
         raise Exception(errore)
-    
+
     if not os.path.exists(f"{util.getOutputFolder()}"):
         os.makedirs(util.getOutputFolder())
 

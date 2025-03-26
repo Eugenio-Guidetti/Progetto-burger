@@ -17,7 +17,11 @@ def unisciVoceMusica(vocePath: str, musicaPath: str):
 
     audio = mp.CompositeAudioClip([musica, voce])
 
-    audio.write_audiofile(outputFilePath)
+    audio.write_audiofile(outputFilePath, logger="bar")
+
+    voce.close()
+    musica.close()
+    audio.close()
 
     return outputFilePath
 
@@ -36,12 +40,15 @@ def unisciAudioVideo(audioPath: str, videoPath: str):
 
     if audio.duration > video.duration:
         audio = audio.subclipped(0, video.duration)
-        
+
     if video.duration > audio.duration:
         video = video.subclipped(0, audio.duration)
 
     video.audio = audio
 
-    video.write_videofile(outputFilePath)
+    video.write_videofile(outputFilePath, logger=None)
+
+    audio.close()
+    video.close()
 
     return outputFilePath

@@ -26,8 +26,12 @@ def getVoceOutputFilePath():
     return f"{os.getcwd()}\\out\\{str.removesuffix(getInputFileName(), ".txt")}\\{os.environ["VOICE_OUTPUT_FILE_NAME"]}"
 
 
-def getVoceSelezionata():
-    return os.environ["VOCE_SELEZIONATA"]
+def getNomeVoceSelezionata():
+    return os.environ["NOME_VOCE_SELEZIONATA"]
+
+
+def getIdVoceSelezionata():
+    return os.environ["ID_VOCE_SELEZIONATA"]
 
 
 def getMusicaFilePath():
@@ -47,99 +51,139 @@ def getVideoOutputFilePath():
 
 
 def getTesto():
-    return open(getInputFilePath(), "r").read()
+    try:
+        return open(getInputFilePath(), "r").read()
+    except FileNotFoundError:
+        raise Exception("Il testo selezionato non è disponibile")
 
 
 def selezionaTesto():
+    if not os.path.exists(getInputFilesDir()):
+        os.mkdir(getInputFilesDir())
+        print("Nessun testo disponibile")
+        return
+    
     testi = glob.glob(f"{getInputFilesDir()}\\*.txt")
 
     if len(testi) == 0:
         print("Nessun testo disponibile")
         return
 
-    print("\nTesti disponibili:")
+    print("Testi disponibili:")
     for i in range(len(testi)):
         testo = testi[i]
-        print(f" {i}) {testo}")
+        print(f" {i + 1})\t{testo}")
 
-    try:
-        scelta = input("Scegli un'opzione: ")
-    except KeyboardInterrupt:
-        print("\nNessun testo selezionato")
-        return
+    while True:
+        try:
+            scelta = input("Scegli un'opzione: ")
+        except KeyboardInterrupt:
+            os.environ["TESTO_SELEZIONATO"] = ""
+            print("\nNessun testo selezionato")
 
-    try:
-        scelta = int(scelta)
-    except:
-        print("Input non valido")
-        return
+        else:
+            try:
+                scelta = int(scelta) - 1
+            except:
+                print("Input non valido")
+                continue
 
-    try:
-        os.environ["TESTO_SELEZIONATO"] = str.removeprefix(
-            testi[scelta], f"{getInputFilesDir()}\\"
+            try:
+                if scelta < 0 or scelta >= len(testi):
+                    raise Exception("Scelta non valida")
+
+                os.environ["TESTO_SELEZIONATO"] = str.removeprefix(
+                    testi[scelta], f"{getInputFilesDir()}\\"
+                )
+
+            except:
+                print("Scelta non valida")
+                continue
+
+        dotenv.set_key(
+            dotenv.find_dotenv(), "TESTO_SELEZIONATO", os.environ["TESTO_SELEZIONATO"]
         )
-
-    except:
-        print("Scelta non valida")
+        print("")
         return
-
-    dotenv.set_key(
-        dotenv.find_dotenv(), "TESTO_SELEZIONATO", os.environ["TESTO_SELEZIONATO"]
-    )
 
 
 def mostraTestoSelezionato():
     try:
-        print(f'\nTesto selezionato: \n"{getTesto()}"')
+        print(f'Testo selezionato "{getInputFileName()}": \n"{getTesto()}"')
     except:
-        print(f"Testo {getInputFilePath()} non disponibile, seleziona un altro testo")
+        print(f'Testo "{getInputFilePath()}" non disponibile, seleziona un altro testo')
 
 
 def selezionaVoce():
 
     data = elevenLabsGeneratoreAudio.getVociDisponibili()
 
+    if len(data["voices"]) == 0:
+        print("Nessuna voce disponibile")
+        return
+
     max = -1
     for voice in data["voices"]:
         if len(voice["name"]) > max:
             max = len(voice["name"])
 
-    print("\nVoci disponibili:")
+    print("Voci disponibili:")
     for i in range(len(data["voices"])):
         voice = data["voices"][i]
         print(
-            f' {i}) Nome: "{voice["name"]}"{ " " * (max - len(voice["name"]))}  id: "{voice["voice_id"]}"'
+            f' {i + 1})\tNome: "{voice["name"]}"{ " " * (max - len(voice["name"]))}  id: "{voice["voice_id"]}"'
         )
 
-    try:
-        scelta = input("Scegli un'opzione: ")
-    except KeyboardInterrupt:
-        print("\nNessuna voce selezionata")
-        return
+    while True:
+        try:
+            scelta = input("Scegli un'opzione: ")
+        except KeyboardInterrupt:
+            os.environ["ID_VOCE_SELEZIONATA"] = ""
+            os.environ["NOME_VOCE_SELEZIONATA"] = "Nessuna voce selezionata"
+            print("\nNessuna voce selezionata")
 
-    try:
-        scelta = int(scelta)
-    except:
-        print("Input non valido")
-        return
+        else:
+            try:
+                scelta = int(scelta) - 1
+            except:
+                print("Input non valido")
+                continue
 
-    try:
-        os.environ["VOCE_SELEZIONATA"] = data["voices"][scelta]
-    except:
-        print("Scelta non valida")
-        return
+            try:
+                if scelta < 0 or scelta >= len(data["voices"]):
+                    raise Exception("Scelta non valida")
 
-    dotenv.set_key(
-        dotenv.find_dotenv(), "VOCE_SELEZIONATA", os.environ["VOCE_SELEZIONATA"]
-    )
+                os.environ["ID_VOCE_SELEZIONATA"] = data["voices"][scelta]["voice_id"]
+                os.environ["NOME_VOCE_SELEZIONATA"] = data["voices"][scelta]["name"]
+
+            except:
+                print("Scelta non valida")
+                continue
+
+        dotenv.set_key(
+            dotenv.find_dotenv(),
+            "ID_VOCE_SELEZIONATA",
+            os.environ["ID_VOCE_SELEZIONATA"],
+        )
+        dotenv.set_key(
+            dotenv.find_dotenv(),
+            "NOME_VOCE_SELEZIONATA",
+            os.environ["NOME_VOCE_SELEZIONATA"],
+        )
+
+        print("")
+        return
 
 
 def mostraVoceSelezionata():
-    print(f"\nVoce selezionata: {getVoceSelezionata()}")
+    print(
+        f'Voce selezionata: "{getNomeVoceSelezionata()}"; Id: "{getIdVoceSelezionata()}"'
+    )
 
 
 def convertiTestoVoce():
     try:
+
         out = elevenLabsGeneratoreAudio.convertiTestoVoce(getTesto())
         print(f"File creato: {out}")
 

@@ -1,4 +1,8 @@
 *.key
 out/
-in/
-__pycache__/
+in/*.txt
+!in/Esempio*.txt
+build/
+dist/
+*.spec
+*.bat

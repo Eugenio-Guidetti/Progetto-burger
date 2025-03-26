@@ -1,9 +1,9 @@
-import config
+from dotenv import load_dotenv
 import menu
 import util
 
 if __name__ == "__main__":
-    config.inizializza()
+    load_dotenv()
 
     # PROGETTO BURGER
     print(
@@ -17,36 +17,36 @@ if __name__ == "__main__":
 
             case 1:
                 util.selezionaTesto()
-
-            case 2:
                 util.mostraTestoSelezionato()
-
-            case 3:
-                util.selezionaVoce()
-
-            case 4:
-                util.mostraVoceSelezionata()
-
-            case 5:
                 util.convertiTestoVoce()
-
-            case 6:
                 util.unisciVoceMusica()
-
-            case 7:
                 util.unisciAudioVideo()
 
-            case 8:
+            case 2:
                 util.selezionaTesto()
                 util.mostraTestoSelezionato()
                 util.convertiTestoVoce()
+                util.unisciVoceMusica()
+
+            case 3:
+                util.selezionaTesto()
+
+            case 4:
+                util.mostraTestoSelezionato()
+
+            case 5:
+                util.selezionaVoce()
+
+            case 6:
+                util.mostraVoceSelezionata()
+
+            case 7:
+                util.convertiTestoVoce()
+
+            case 8:
                 util.unisciVoceMusica()
 
             case 9:
-                util.selezionaTesto()
-                util.mostraTestoSelezionato()
-                util.convertiTestoVoce()
-                util.unisciVoceMusica()
                 util.unisciAudioVideo()
 
             case _:
